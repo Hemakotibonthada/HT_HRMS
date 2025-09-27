@@ -10,18 +10,18 @@ export const DashboardPage = () => {
 
   return (
     <div className="space-y-12 animate-slide-up">
-      <section className="relative rounded-3xl glass-effect border border-white/20 p-12 backdrop-blur-xl overflow-hidden group hover:border-blue-400/30 transition-all duration-500">
+      <section className="relative rounded-2xl sm:rounded-3xl glass-effect border border-white/20 p-6 sm:p-8 lg:p-12 backdrop-blur-xl overflow-hidden group hover:border-blue-400/30 transition-all duration-500">
         {/* Animated background elements */}
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700" />
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700" />
         
         <div className="relative z-10">
           <p className="text-sm uppercase tracking-[0.3em] text-blue-400 font-bold animate-slide-in-left">Welcome back</p>
-          <h1 className="mt-6 max-w-4xl text-4xl lg:text-6xl font-black text-white leading-tight animate-slide-in-right">
+          <h1 className="mt-4 sm:mt-6 max-w-4xl text-2xl sm:text-4xl lg:text-6xl font-black text-white leading-tight animate-slide-in-right">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-cyan-200">
               {fullName || user?.email}
             </span>
-            <span className="block text-2xl lg:text-3xl mt-4 text-slate-200 font-medium">
+            <span className="block text-lg sm:text-2xl lg:text-3xl mt-2 sm:mt-4 text-slate-200 font-medium">
               manage people and projects in one secure workspace.
             </span>
           </h1>
@@ -37,7 +37,7 @@ export const DashboardPage = () => {
         </div>
       </section>
 
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid gap-6 sm:gap-8 lg:gap-10 grid-cols-1 lg:grid-cols-2">
         <Card
           variant="glass"
           glow={true}
@@ -45,9 +45,9 @@ export const DashboardPage = () => {
           title="Employee Portal"
           subtitle="Manage profiles, timesheets, and payroll."
           action={
-            <Button variant="primary" size="lg" glow={true} asChild>
+            <Button variant="primary" size="lg" glow={true} asChild className="w-full sm:w-auto min-h-[44px]">
               <Link to="/portal/employee">
-                <span className="flex items-center">
+                <span className="flex items-center justify-center">
                   Open Portal
                   <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />

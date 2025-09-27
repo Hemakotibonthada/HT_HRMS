@@ -6,21 +6,24 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardPage } from './pages/Dashboard';
 import { EmployeePortalPage } from './pages/employee/EmployeePortal';
 import { WorkPortalPage } from './pages/work/WorkPortal';
+import { ToastProvider } from './components/ui/Toast';
 
 const App = () => {
   return (
-    <Routes>
-  <Route path="/" element={<LandingPage />} />
-  <Route path="/login" element={<LoginPage />} />
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AuthenticatedLayout />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/portal/employee" element={<EmployeePortalPage />} />
-          <Route path="/portal/work" element={<WorkPortalPage />} />
+    <ToastProvider>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AuthenticatedLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/portal/employee" element={<EmployeePortalPage />} />
+            <Route path="/portal/work" element={<WorkPortalPage />} />
+          </Route>
         </Route>
-      </Route>
-  <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ToastProvider>
   );
 };
 

@@ -86,19 +86,33 @@ export const TimesheetForm = ({ projects, onSubmit, isSubmitting = false }: Time
     >
       <form onSubmit={handleSubmit} className="grid gap-6 sm:grid-cols-2">
         <div className="sm:col-span-2 group">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
-            Project
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
+              Project *
+            </label>
+            <Tooltip content="Select the project you worked on. This field is required.">
+              <svg className="w-4 h-4 text-slate-400 hover:text-slate-300 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+            </Tooltip>
+          </div>
           <div className="relative mt-2">
             <select
               value={values.projectId}
               onChange={handleChange('projectId')}
-              className="w-full rounded-xl border border-white/20 backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
-                       focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/15
-                       hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-sm hover:shadow-md
-                       appearance-none cursor-pointer"
+              className={`w-full rounded-xl border backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
+                       focus:outline-none focus:ring-2 focus:bg-white/15
+                       hover:bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md
+                       appearance-none cursor-pointer ${
+                         fieldErrors.projectId 
+                           ? 'border-red-400/50 focus:border-red-400 focus:ring-red-400/25' 
+                           : 'border-white/20 focus:border-blue-400 focus:ring-blue-400/25 hover:border-white/30'
+                       }`}
+              aria-describedby={fieldErrors.projectId ? 'project-error' : undefined}
+              required
             >
-              {projects.length === 0 && <option value="" className="bg-slate-800 text-white">No projects available</option>}
+              <option value="" className="bg-slate-800 text-white">Select a project...</option>
+              {projects.length === 0 && <option value="" className="bg-slate-800 text-white" disabled>No projects available</option>}
               {projects.map((project) => (
                 <option key={project.id} value={project.id} className="bg-slate-800 text-white">
                   {project.title}
@@ -112,6 +126,14 @@ export const TimesheetForm = ({ projects, onSubmit, isSubmitting = false }: Time
             </div>
             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
           </div>
+          {fieldErrors.projectId && (
+            <p id="project-error" className="mt-1 text-xs text-red-300 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {fieldErrors.projectId}
+            </p>
+          )}
         </div>
 
         <div className="group">
@@ -162,27 +184,51 @@ export const TimesheetForm = ({ projects, onSubmit, isSubmitting = false }: Time
         </div>
 
         <div className="group">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
-            Hours
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
+              Hours *
+            </label>
+            <Tooltip content="Enter hours worked (0.25 hour increments). Maximum 24 hours per day.">
+              <svg className="w-4 h-4 text-slate-400 hover:text-slate-300 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+            </Tooltip>
+          </div>
           <div className="relative mt-2">
             <input
               type="number"
               min="0"
+              max="24"
               step="0.25"
               value={values.hours}
               onChange={handleChange('hours')}
-              className="w-full rounded-xl border border-white/20 backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
-                       focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/15
-                       hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-sm hover:shadow-md
-                       placeholder:text-slate-400"
+              className={`w-full rounded-xl border backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
+                       focus:outline-none focus:ring-2 focus:bg-white/15
+                       hover:bg-white/15 transition-all duration-300 shadow-sm hover:shadow-md
+                       placeholder:text-slate-400 ${
+                         fieldErrors.hours 
+                           ? 'border-red-400/50 focus:border-red-400 focus:ring-red-400/25' 
+                           : 'border-white/20 focus:border-blue-400 focus:ring-blue-400/25 hover:border-white/30'
+                       }`}
               placeholder="8.0"
+              aria-describedby={fieldErrors.hours ? 'hours-error' : 'hours-hint'}
+              required
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <span className="text-xs text-slate-400 group-focus-within:text-blue-400 transition-colors duration-200">hrs</span>
             </div>
             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
           </div>
+          {fieldErrors.hours ? (
+            <p id="hours-error" className="mt-1 text-xs text-red-300 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {fieldErrors.hours}
+            </p>
+          ) : (
+            <p id="hours-hint" className="mt-1 text-xs text-slate-400">Use increments of 0.25 (15 minutes)</p>
+          )}
         </div>
 
         <div className="sm:col-span-2 group">

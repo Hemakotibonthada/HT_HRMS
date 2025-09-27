@@ -73,7 +73,7 @@ export const LoginPage: React.FC = () => {
         <div className="absolute -right-24 top-24 h-72 w-72 rounded-full bg-secondary/25 blur-3xl" />
       </div>
 
-      <div className="relative z-10 grid min-h-screen items-stretch gap-0 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="relative z-10 grid min-h-screen items-stretch gap-0 lg:grid-cols-[1.05fr_0.95fr] max-lg:grid-cols-1">
         <section className="hidden flex-col justify-between border-r border-primary/15 bg-gradient-to-br from-white via-neutral-light to-primary/10 px-12 py-14 shadow-inner lg:flex">
           <div className="space-y-9">
             <div className="flex items-center gap-3 text-sm uppercase tracking-[0.3em] text-primary">
@@ -121,9 +121,9 @@ export const LoginPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="flex items-center justify-center px-6 py-16 sm:px-10 lg:px-16">
-          <div className="w-full max-w-md space-y-12">
-            <header className="flex items-center justify-between rounded-full border border-primary/15 bg-white px-4 py-2 text-[0.65rem] uppercase tracking-[0.35em] text-neutral-muted shadow-card lg:hidden">
+        <section className="flex items-center justify-center px-4 py-8 sm:px-10 lg:px-16 min-h-screen lg:min-h-auto">
+          <div className="w-full max-w-md space-y-8 sm:space-y-12">
+            <header className="flex items-center justify-between rounded-full border border-primary/15 bg-white px-4 py-3 text-xs sm:text-[0.65rem] uppercase tracking-[0.25em] sm:tracking-[0.35em] text-neutral-muted shadow-card lg:hidden">
               <span className="flex items-center gap-2 text-primary">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[0.8rem] font-semibold">
                   HT
@@ -148,14 +148,14 @@ export const LoginPage: React.FC = () => {
                   <span>SOC 2</span>
                 </div>
               </div>
-              <h2 className="text-3xl font-semibold text-neutral-dark lg:text-4xl">Sign in to your HT Connect workspace</h2>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-neutral-dark leading-tight">Sign in to your HT Connect workspace</h2>
               <p className="text-sm text-neutral-muted">
                 Centralise authorisations, payroll, and project delivery within a zero trust perimeter. Every session is monitored and
                 signed for audit readiness.
               </p>
             </div>
 
-            <div className="relative rounded-3xl border border-white/20 backdrop-blur-xl bg-gradient-to-br from-white/80 via-white/60 to-white/40 p-10 shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 hover:border-white/30">
+            <div className="relative rounded-2xl sm:rounded-3xl border border-white/20 backdrop-blur-xl bg-gradient-to-br from-white/80 via-white/60 to-white/40 p-6 sm:p-10 shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 hover:border-white/30">
               {/* Animated background elements */}
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-full blur-2xl animate-float" />
@@ -238,7 +238,7 @@ export const LoginPage: React.FC = () => {
                   </span>
                 </Button>
 
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 grid-cols-1 xs:grid-cols-3 sm:grid-cols-3">
                   {trustMetrics.map((metric) => (
                     <div key={metric.label} className="rounded-2xl border border-primary/15 bg-white/90 p-4 text-center shadow-sm">
                       <p className="text-xl font-semibold text-primary">{metric.label}</p>
@@ -247,7 +247,7 @@ export const LoginPage: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="grid gap-3">
+                <div className="grid gap-3 sm:gap-4">
                   {assuranceSignals.map(({ title, description, icon }) => (
                     <div key={title} className="flex items-start gap-3 rounded-2xl border border-primary/15 bg-neutral-light/85 px-4 py-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/25 via-secondary/20 to-accent/25 text-xl">
@@ -261,7 +261,7 @@ export const LoginPage: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.3em] text-neutral-muted">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-neutral-muted">
                   <Badge variant="outline" className="border-primary/25 bg-primary/5 text-primary">
                     SOC 2 Controls
                   </Badge>
