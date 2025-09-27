@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { Tooltip } from '../ui/Tooltip';
 import type { Project, WorkItem } from '../../types/api';
 
 interface TimesheetFormValues {
@@ -28,6 +29,7 @@ const getInitialValues = (projects: Project[]): TimesheetFormValues => ({
 export const TimesheetForm = ({ projects, onSubmit, isSubmitting = false }: TimesheetFormProps) => {
   const [values, setValues] = useState<TimesheetFormValues>(() => getInitialValues(projects));
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof TimesheetFormValues, string>>>({});
 
   const selectedProject = useMemo(() => projects.find((project) => project.id === values.projectId), [projects, values.projectId]);
   const workItems: WorkItem[] = useMemo(() => selectedProject?.workItems ?? [], [selectedProject]);
@@ -47,18 +49,74 @@ export const TimesheetForm = ({ projects, onSubmit, isSubmitting = false }: Time
   }, [projects]);
 
   const handleChange = (field: keyof TimesheetFormValues) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const value = event.target.value;
     setValues((prev) => ({
       ...prev,
-      [field]: event.target.value,
+      [field]: value,
     }));
+    
+    // Clear field error when user starts typing
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
+    
+    // Real-time validation
+    validateField(field, value);
+  };
+
+  const validateField = (field: keyof TimesheetFormValues, value: string) => {
+    const newFieldErrors = { ...fieldErrors };
+    
+    switch (field) {
+      case 'projectId':
+        if (!value) {
+          newFieldErrors.projectId = 'Please select a project';
+        } else {
+          delete newFieldErrors.projectId;
+        }
+        break;
+        
+      case 'hours':
+        const numericHours = Number.parseFloat(value);
+        if (!value) {
+          newFieldErrors.hours = 'Hours is required';
+        } else if (Number.isNaN(numericHours) || numericHours <= 0) {
+          newFieldErrors.hours = 'Please enter a valid number of hours';
+        } else if (numericHours > 24) {
+          newFieldErrors.hours = 'Hours cannot exceed 24 per day';
+        } else {
+          delete newFieldErrors.hours;
+        }
+        break;
+        
+      case 'workDate':
+        if (!value) {
+          newFieldErrors.workDate = 'Work date is required';
+        } else {
+          delete newFieldErrors.workDate;
+        }
+        break;
+    }
+    
+    setFieldErrors(newFieldErrors);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
 
-    if (!values.projectId) {
-      setError('Select a project to log time against.');
+    // Validate all fields
+    validateField('projectId', values.projectId);
+    validateField('hours', values.hours);
+    validateField('workDate', values.workDate);
+
+    // Check for validation errors
+    const hasErrors = Object.values(fieldErrors).some(error => error);
+    if (hasErrors) {
+      setError('Please fix the validation errors before submitting.');
       return;
     }
 
@@ -77,6 +135,7 @@ export const TimesheetForm = ({ projects, onSubmit, isSubmitting = false }: Time
     });
 
     setValues(getInitialValues(projects));
+    setFieldErrors({});
   };
 
   return (
