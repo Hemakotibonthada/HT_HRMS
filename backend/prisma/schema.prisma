@@ -1,0 +1,561 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+enum UserRole {
+  ADMIN
+  PROJECT_MANAGER
+  EMPLOYEE
+}
+
+enum ProjectStatus {
+  IN_PROGRESS
+  COMPLETE
+  ON_HOLD
+}
+
+enum WorkItemType {
+  FEATURE
+  BUG
+  TASK
+}
+
+enum WorkItemPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum WorkItemStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum TimesheetStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MembershipRole {
+  MANAGER
+  CONTRIBUTOR
+  VIEWER
+}
+
+enum ExpenseCategory {
+  TRAVEL
+  MEALS
+  EQUIPMENT
+  SOFTWARE
+  OFFICE
+  OTHER
+}
+
+enum ExpenseStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+  REIMBURSED
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+  PAUSED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  CONTRACT
+  INTERN
+}
+
+enum RecruitmentStage {
+  APPLIED
+  SCREENING
+  INTERVIEW
+  OFFER
+  HIRED
+  ARCHIVED
+}
+
+enum AttendanceMethod {
+  BIOMETRIC
+  GPS
+  REMOTE
+}
+
+enum AttendanceType {
+  CHECK_IN
+  CHECK_OUT
+}
+
+enum BenefitType {
+  HEALTH
+  INSURANCE
+  RETIREMENT
+  WELLNESS
+  OTHER
+}
+
+enum BenefitEnrollmentStatus {
+  ACTIVE
+  PENDING
+  CANCELLED
+}
+
+enum PayrollStatus {
+  DRAFT
+  FINALIZED
+}
+
+enum PerformanceCycleStatus {
+  UPCOMING
+  ACTIVE
+  CLOSED
+}
+
+enum PerformanceGoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  ON_TRACK
+  AT_RISK
+  COMPLETED
+}
+
+enum PerformanceReviewStatus {
+  DRAFT
+  SUBMITTED
+  ACKNOWLEDGED
+}
+
+enum PerformanceRating {
+  OUTSTANDING
+  EXCEEDS
+  MEETS
+  DEVELOPING
+  UNSATISFACTORY
+}
+
+model User {
+  id            String            @id @default(uuid())
+  email         String            @unique
+  passwordHash  String
+  role          UserRole          @default(EMPLOYEE)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  profile       EmployeeProfile?
+  memberships   ProjectMembership[]
+  managedProjects Project[]       @relation("ProjectManager")
+  reportedItems WorkItem[]        @relation("ReportedItems")
+  assignedItems WorkItem[]        @relation("AssignedItems")
+  comments      WorkItemComment[]
+  historyLogs   WorkItemHistory[]
+  timesheets    Timesheet[]
+  payslips      Payslip[]
+  approvedTimesheets Timesheet[] @relation("TimesheetApprover")
+  teamMembers   EmployeeProfile[] @relation("EmployeeManager")
+  attendanceLogs AttendanceLog[]
+  benefitEnrollments BenefitEnrollment[]
+  payrollEntries PayrollEntry[]
+  stageUpdates  CandidateStageHistory[] @relation("StageChanger")
+  expenseClaims ExpenseClaim[]
+  approvedExpenses ExpenseClaim[] @relation("ExpenseApprover")
+  performanceGoals PerformanceGoal[] @relation("GoalOwner")
+  performanceReviews EmployeePerformanceReview[] @relation("EmployeeReview")
+  submittedReviews EmployeePerformanceReview[] @relation("ManagerReview")
+
+  @@map("users")
+}
+
+model EmployeeProfile {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  firstName        String
+  lastName         String
+  position         String
+  department       String
+  joiningDate      DateTime
+  contactEmail     String
+  contactPhone     String?
+  emergencyContact String?
+  reportingManager String?
+  managerId        String?
+
+  user             User     @relation(fields: [userId], references: [id])
+  manager          User?    @relation("EmployeeManager", fields: [managerId], references: [id])
+
+  @@map("employee_profiles")
+}
+
+model Project {
+  id          String              @id @default(uuid())
+  title       String
+  description String?
+  status      ProjectStatus       @default(IN_PROGRESS)
+  startDate   DateTime?
+  dueDate     DateTime?
+  managerId   String
+
+  manager     User                @relation("ProjectManager", fields: [managerId], references: [id])
+  members     ProjectMembership[]
+  workItems   WorkItem[]
+  timesheets  Timesheet[]
+  milestones  Milestone[]
+
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@map("projects")
+}
+
+model ProjectMembership {
+  id        String         @id @default(uuid())
+  role      MembershipRole @default(CONTRIBUTOR)
+  userId    String
+  projectId String
+
+  user      User           @relation(fields: [userId], references: [id])
+  project   Project        @relation(fields: [projectId], references: [id])
+
+  @@unique([userId, projectId])
+  @@map("project_memberships")
+}
+
+model Milestone {
+  id          String   @id @default(uuid())
+  projectId   String
+  title       String
+  description String?
+  startDate   DateTime?
+  dueDate     DateTime?
+
+  project     Project  @relation(fields: [projectId], references: [id])
+
+  @@map("milestones")
+}
+
+model WorkItem {
+  id          String          @id @default(uuid())
+  projectId   String
+  reporterId  String
+  assigneeId  String
+  title       String
+  description String?
+  type        WorkItemType    @default(TASK)
+  priority    WorkItemPriority @default(MEDIUM)
+  status      WorkItemStatus  @default(TODO)
+  dueDate     DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  project     Project         @relation(fields: [projectId], references: [id])
+  reporter    User            @relation("ReportedItems", fields: [reporterId], references: [id])
+  assignee    User            @relation("AssignedItems", fields: [assigneeId], references: [id])
+  comments    WorkItemComment[]
+  history     WorkItemHistory[]
+  timesheets  Timesheet[]
+
+  @@map("work_items")
+}
+
+model WorkItemComment {
+  id         String   @id @default(uuid())
+  workItemId String
+  authorId   String
+  body       String
+  createdAt  DateTime @default(now())
+
+  workItem   WorkItem @relation(fields: [workItemId], references: [id])
+  author     User     @relation(fields: [authorId], references: [id])
+
+  @@map("work_item_comments")
+}
+
+model WorkItemHistory {
+  id          String         @id @default(uuid())
+  workItemId  String
+  changedById String
+  status      WorkItemStatus
+  changedAt   DateTime       @default(now())
+
+  workItem    WorkItem       @relation(fields: [workItemId], references: [id])
+  changedBy   User           @relation(fields: [changedById], references: [id])
+
+  @@map("work_item_history")
+}
+
+model Timesheet {
+  id             String          @id @default(uuid())
+  userId         String
+  projectId      String
+  workItemId     String?
+  workDate       DateTime
+  hours          Decimal         @db.Decimal(5, 2)
+  description    String?
+  status         TimesheetStatus @default(PENDING)
+  submittedAt    DateTime        @default(now())
+  approvedAt     DateTime?
+  approvedById   String?
+
+  user           User            @relation(fields: [userId], references: [id])
+  project        Project         @relation(fields: [projectId], references: [id])
+  workItem       WorkItem?       @relation(fields: [workItemId], references: [id])
+  approvedBy     User?           @relation("TimesheetApprover", fields: [approvedById], references: [id])
+
+  @@map("timesheets")
+}
+
+model Payslip {
+  id        String   @id @default(uuid())
+  userId    String
+  month     Int
+  year      Int
+  filePath  String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, month, year])
+  @@map("payslips")
+}
+
+model AttendanceLog {
+  id           String           @id @default(uuid())
+  userId       String
+  type         AttendanceType
+  method       AttendanceMethod
+  timestamp    DateTime         @default(now())
+  deviceId     String?
+  latitude     Float?
+  longitude    Float?
+  locationName String?
+  notes        String?
+  createdAt    DateTime         @default(now())
+
+  user         User             @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+  @@map("attendance_logs")
+}
+
+model BenefitPlan {
+  id                    String                  @id @default(uuid())
+  name                  String
+  description           String?
+  type                  BenefitType             @default(OTHER)
+  employeeContribution  Decimal?                @db.Decimal(10, 2)
+  employerContribution  Decimal?                @db.Decimal(10, 2)
+  effectiveFrom         DateTime?
+  effectiveTo           DateTime?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  enrollments           BenefitEnrollment[]
+
+  @@map("benefit_plans")
+}
+
+model BenefitEnrollment {
+  id                   String                   @id @default(uuid())
+  userId               String
+  planId               String
+  status               BenefitEnrollmentStatus  @default(PENDING)
+  enrolledAt           DateTime                 @default(now())
+  effectiveDate        DateTime?
+  endDate              DateTime?
+  employeeContribution Decimal?                 @db.Decimal(10, 2)
+  employerContribution Decimal?                 @db.Decimal(10, 2)
+
+  user                 User                     @relation(fields: [userId], references: [id])
+  plan                 BenefitPlan              @relation(fields: [planId], references: [id])
+
+  @@map("benefit_enrollments")
+}
+
+model PayrollRun {
+  id          String         @id @default(uuid())
+  label       String?
+  month       Int
+  year        Int
+  status      PayrollStatus  @default(DRAFT)
+  processedAt DateTime?
+  totalGross  Decimal        @default(0) @db.Decimal(12, 2)
+  totalNet    Decimal        @default(0) @db.Decimal(12, 2)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  entries     PayrollEntry[]
+
+  @@unique([month, year])
+  @@map("payroll_runs")
+}
+
+model PayrollEntry {
+  id          String   @id @default(uuid())
+  payrollRunId String
+  userId      String
+  grossPay    Decimal  @db.Decimal(12, 2)
+  deductions  Decimal  @db.Decimal(12, 2)
+  netPay      Decimal  @db.Decimal(12, 2)
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  payrollRun  PayrollRun @relation(fields: [payrollRunId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+
+  @@index([userId, payrollRunId])
+  @@map("payroll_entries")
+}
+
+model JobOpening {
+  id            String           @id @default(uuid())
+  title         String
+  department    String
+  location      String?
+  description   String?
+  employmentType EmploymentType  @default(FULL_TIME)
+  status        JobStatus        @default(OPEN)
+  openings      Int              @default(1)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  candidates    CandidateApplication[]
+
+  @@map("job_openings")
+}
+
+model CandidateApplication {
+  id              String             @id @default(uuid())
+  jobId           String
+  firstName       String
+  lastName        String
+  email           String
+  phone           String?
+  resumeUrl       String?
+  source          String?
+  stage           RecruitmentStage   @default(APPLIED)
+  notes           String?
+  lastInteraction DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  job             JobOpening         @relation(fields: [jobId], references: [id])
+  history         CandidateStageHistory[]
+
+  @@index([jobId])
+  @@map("candidate_applications")
+}
+
+model CandidateStageHistory {
+  id          String           @id @default(uuid())
+  candidateId String
+  fromStage   RecruitmentStage?
+  toStage     RecruitmentStage
+  changedById String?
+  note        String?
+  changedAt   DateTime         @default(now())
+
+  candidate   CandidateApplication @relation(fields: [candidateId], references: [id])
+  changedBy   User?             @relation("StageChanger", fields: [changedById], references: [id])
+
+  @@index([candidateId])
+  @@map("candidate_stage_history")
+}
+
+model ExpenseClaim {
+  id            String         @id @default(uuid())
+  userId        String
+  title         String
+  description   String?
+  category      ExpenseCategory
+  amount        Decimal        @db.Decimal(12, 2)
+  currency      String         @default("USD")
+  incurredOn    DateTime
+  receiptUrl    String?
+  status        ExpenseStatus  @default(SUBMITTED)
+  submittedAt   DateTime       @default(now())
+  approvedAt    DateTime?
+  approvedById  String?
+  rejectionReason String?
+  notes         String?
+
+  user          User           @relation(fields: [userId], references: [id])
+  approvedBy    User?          @relation("ExpenseApprover", fields: [approvedById], references: [id])
+
+  @@index([userId])
+  @@index([approvedById])
+  @@map("expense_claims")
+}
+
+model PerformanceCycle {
+  id        String                  @id @default(uuid())
+  name      String
+  status    PerformanceCycleStatus  @default(UPCOMING)
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+
+  goals     PerformanceGoal[]
+  reviews   EmployeePerformanceReview[]
+
+  @@map("performance_cycles")
+}
+
+model PerformanceGoal {
+  id          String                 @id @default(uuid())
+  ownerId     String
+  cycleId     String
+  title       String
+  description String?
+  status      PerformanceGoalStatus  @default(NOT_STARTED)
+  progress    Int                    @default(0)
+  dueDate     DateTime?
+  updatedAt   DateTime               @updatedAt
+  createdAt   DateTime               @default(now())
+
+  owner       User                   @relation("GoalOwner", fields: [ownerId], references: [id])
+  cycle       PerformanceCycle       @relation(fields: [cycleId], references: [id])
+
+  @@map("performance_goals")
+}
+
+model EmployeePerformanceReview {
+  id            String                    @id @default(uuid())
+  employeeId    String
+  managerId     String
+  cycleId       String
+  status        PerformanceReviewStatus   @default(DRAFT)
+  rating        PerformanceRating?
+  summary       String?
+  strengths     String?
+  growthAreas   String?
+  submittedAt   DateTime?
+  acknowledgedAt DateTime?
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  employee      User                      @relation("EmployeeReview", fields: [employeeId], references: [id])
+  manager       User                      @relation("ManagerReview", fields: [managerId], references: [id])
+  cycle         PerformanceCycle          @relation(fields: [cycleId], references: [id])
+
+  @@unique([employeeId, cycleId])
+  @@map("performance_reviews")
+}
