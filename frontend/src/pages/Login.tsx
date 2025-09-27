@@ -155,48 +155,87 @@ export const LoginPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-primary/15 bg-gradient-to-br from-white via-white to-primary/10 p-10 shadow-2xl">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-neutral-dark">
+            <div className="relative rounded-3xl border border-white/20 backdrop-blur-xl bg-gradient-to-br from-white/80 via-white/60 to-white/40 p-10 shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 hover:border-white/30">
+              {/* Animated background elements */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-full blur-2xl animate-float" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-500/30 to-pink-500/30 rounded-full blur-2xl animate-float animation-delay-200" />
+              </div>
+              
+              <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
+                <div className="space-y-2 group">
+                  <label htmlFor="email" className="block text-sm font-medium text-neutral-dark group-focus-within:text-blue-600 transition-colors duration-200">
                     Email address
                   </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="block w-full rounded-xl border border-primary/20 bg-white px-4 py-3 text-sm text-neutral-dark placeholder:text-neutral-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
-                    placeholder="you@htlabs.ai"
-                    autoComplete="email"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      className="block w-full rounded-xl border border-white/30 backdrop-blur-sm bg-white/70 px-4 py-3 text-sm text-neutral-dark placeholder:text-neutral-muted 
+                               focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/80
+                               hover:bg-white/75 hover:border-white/40 transition-all duration-300 shadow-sm hover:shadow-md"
+                      placeholder="you@htlabs.ai"
+                      autoComplete="email"
+                      required
+                    />
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-neutral-dark">
+                <div className="space-y-2 group">
+                  <label htmlFor="password" className="block text-sm font-medium text-neutral-dark group-focus-within:text-blue-600 transition-colors duration-200">
                     Password
                   </label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className="block w-full rounded-xl border border-primary/20 bg-white px-4 py-3 text-sm text-neutral-dark placeholder:text-neutral-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      className="block w-full rounded-xl border border-white/30 backdrop-blur-sm bg-white/70 px-4 py-3 text-sm text-neutral-dark placeholder:text-neutral-muted 
+                               focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/80
+                               hover:bg-white/75 hover:border-white/40 transition-all duration-300 shadow-sm hover:shadow-md"
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      required
+                    />
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  </div>
                 </div>
 
-                {error ? <p className="text-sm text-[#8F3A2A]">{error}</p> : null}
+                {error ? (
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 backdrop-blur-sm animate-slide-up">
+                    <p className="text-sm text-red-700 font-medium">{error}</p>
+                  </div>
+                ) : null}
 
                 <Button
                   type="submit"
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition hover:-translate-y-0.5 hover:shadow-primary/35"
+                  className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 px-6 py-3 text-sm font-semibold text-white shadow-lg 
+                           hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed
+                           before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-white/0 before:via-white/10 before:to-white/0 
+                           before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 overflow-hidden group"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Authenticating…' : 'Sign in securely'}
+                  <span className="relative z-10 flex items-center gap-2">
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Authenticating…
+                      </>
+                    ) : (
+                      <>
+                        Sign in securely
+                        <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors duration-200">
+                          <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 8 8">
+                            <path d="M0 2l4 4 4-4z"/>
+                          </svg>
+                        </div>
+                      </>
+                    )}
+                  </span>
                 </Button>
 
                 <div className="grid gap-3 sm:grid-cols-3">

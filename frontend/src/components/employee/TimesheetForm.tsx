@@ -84,73 +84,144 @@ export const TimesheetForm = ({ projects, onSubmit, isSubmitting = false }: Time
       title="Log Timesheet"
       subtitle="Submit hours against an R&D initiative"
     >
-      <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300">Project</label>
-          <select
-            value={values.projectId}
-            onChange={handleChange('projectId')}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-          >
-            {projects.length === 0 && <option value="">No projects available</option>}
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.title}
-              </option>
-            ))}
-          </select>
+      <form onSubmit={handleSubmit} className="grid gap-6 sm:grid-cols-2">
+        <div className="sm:col-span-2 group">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
+            Project
+          </label>
+          <div className="relative mt-2">
+            <select
+              value={values.projectId}
+              onChange={handleChange('projectId')}
+              className="w-full rounded-xl border border-white/20 backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
+                       focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/15
+                       hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-sm hover:shadow-md
+                       appearance-none cursor-pointer"
+            >
+              {projects.length === 0 && <option value="" className="bg-slate-800 text-white">No projects available</option>}
+              {projects.map((project) => (
+                <option key={project.id} value={project.id} className="bg-slate-800 text-white">
+                  {project.title}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg className="w-4 h-4 text-slate-400 group-focus-within:text-blue-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </div>
         </div>
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300">Work item (optional)</label>
-          <select
-            value={values.workItemId ?? ''}
-            onChange={handleChange('workItemId')}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-          >
-            <option value="">Unassigned</option>
-            {workItems.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
-              </option>
-            ))}
-          </select>
+
+        <div className="group">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
+            Work item (optional)
+          </label>
+          <div className="relative mt-2">
+            <select
+              value={values.workItemId ?? ''}
+              onChange={handleChange('workItemId')}
+              className="w-full rounded-xl border border-white/20 backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
+                       focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/15
+                       hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-sm hover:shadow-md
+                       appearance-none cursor-pointer"
+            >
+              <option value="" className="bg-slate-800 text-white">Unassigned</option>
+              {workItems.map((item) => (
+                <option key={item.id} value={item.id} className="bg-slate-800 text-white">
+                  {item.title}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg className="w-4 h-4 text-slate-400 group-focus-within:text-blue-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </div>
         </div>
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300">Work date</label>
-          <input
-            type="date"
-            value={values.workDate}
-            onChange={handleChange('workDate')}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-          />
+
+        <div className="group">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
+            Work date
+          </label>
+          <div className="relative mt-2">
+            <input
+              type="date"
+              value={values.workDate}
+              onChange={handleChange('workDate')}
+              className="w-full rounded-xl border border-white/20 backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
+                       focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/15
+                       hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-sm hover:shadow-md
+                       [color-scheme:dark]"
+            />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </div>
         </div>
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300">Hours</label>
-          <input
-            type="number"
-            min="0"
-            step="0.25"
-            value={values.hours}
-            onChange={handleChange('hours')}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-            placeholder="8.0"
-          />
+
+        <div className="group">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
+            Hours
+          </label>
+          <div className="relative mt-2">
+            <input
+              type="number"
+              min="0"
+              step="0.25"
+              value={values.hours}
+              onChange={handleChange('hours')}
+              className="w-full rounded-xl border border-white/20 backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
+                       focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/15
+                       hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-sm hover:shadow-md
+                       placeholder:text-slate-400"
+              placeholder="8.0"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <span className="text-xs text-slate-400 group-focus-within:text-blue-400 transition-colors duration-200">hrs</span>
+            </div>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </div>
         </div>
-        <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300">Notes</label>
-          <textarea
-            value={values.description}
-            onChange={handleChange('description')}
-            rows={3}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-            placeholder="Summarise the work you've completed"
-          />
+
+        <div className="sm:col-span-2 group">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-slate-300 group-focus-within:text-blue-300 transition-colors duration-200">
+            Notes
+          </label>
+          <div className="relative mt-2">
+            <textarea
+              value={values.description}
+              onChange={handleChange('description')}
+              rows={3}
+              className="w-full rounded-xl border border-white/20 backdrop-blur-sm bg-white/10 px-4 py-3 text-sm text-white 
+                       focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/25 focus:bg-white/15
+                       hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-sm hover:shadow-md
+                       placeholder:text-slate-400 resize-none"
+              placeholder="Summarise the work you've completed"
+            />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </div>
         </div>
+
         {error && (
-          <p className="sm:col-span-2 text-sm text-rose-300">{error}</p>
+          <div className="sm:col-span-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 backdrop-blur-sm animate-slide-up">
+            <p className="text-sm text-red-300 font-medium flex items-center gap-2">
+              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {error}
+            </p>
+          </div>
         )}
+
         <div className="sm:col-span-2 flex justify-end">
-          <Button type="submit" loading={isSubmitting} disabled={projects.length === 0}>
+          <Button 
+            type="submit" 
+            loading={isSubmitting} 
+            disabled={projects.length === 0}
+            className="relative overflow-hidden group hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+          >
             Submit Timesheet
           </Button>
         </div>
